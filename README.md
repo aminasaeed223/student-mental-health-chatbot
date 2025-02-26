@@ -24,7 +24,7 @@ The goal of this project is to create a friendly and supportive chatbot that hel
 1. The user interacts with the chatbot through a simple interface.  
 2. The input is processed using the **Gemini API**, which generates empathetic and helpful responses.  
 3. The chatbot provides suggestions, mental health tips, and supportive advice in real-time.  
-4. The application is deployed on **Vercel** for quick and easy access.  
+4. The application is deployed on **Netlify** for quick and easy access.  
 
 ---
 
