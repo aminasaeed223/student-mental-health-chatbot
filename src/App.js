@@ -24,7 +24,7 @@ function App() {
             return;
         }
 
-        localStorage.setItem('lastMessageTime', currentTime);
+        localStorage.setItem('lastMessageTime', currentTime.toString());
 
         const userMessage = { sender: 'You', text: input };
         setMessages([...messages, userMessage]);
