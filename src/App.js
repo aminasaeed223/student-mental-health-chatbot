@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { getChatbotResponse } from './api/geminiapi';
 import './App.css';
 
@@ -7,7 +7,7 @@ function App() {
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
 
-    const RATE_LIMIT_MS = 3000; // 3-second cooldown
+    const RATE_LIMIT_MS = 3000;
 
     // Generate or get existing user ID for rate limiting
     const userId = localStorage.getItem('userId') || Math.random().toString(36).substring(7);
@@ -24,7 +24,7 @@ function App() {
             return;
         }
 
-        localStorage.setItem('lastMessageTime', currentTime); // Store last message timestamp
+        localStorage.setItem('lastMessageTime', currentTime);
 
         const userMessage = { sender: 'You', text: input };
         setMessages([...messages, userMessage]);
@@ -33,7 +33,7 @@ function App() {
 
         // Ensure chat history includes the latest message before sending
         const chatHistory = [...messages, userMessage]
-            .slice(-10) // Only keep last 10 messages for context
+            .slice(-10) // Keep only the last 10 messages for context
             .map(msg => `${msg.sender}: ${msg.text}`)
             .join('\n');
 
@@ -66,7 +66,7 @@ function App() {
                     placeholder="Feeling stressed? I'm here to help!..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 />
                 <button onClick={handleSend}>Ask MentorBot</button>
             </div>

@@ -1,15 +1,13 @@
 const axios = require('axios');
 require('dotenv').config();
 
-const API_KEY = process.env.GEMINI_API_KEY; // Store API key
+const API_KEY = process.env.GEMINI_API_KEY;
 
 if (!API_KEY) {
     console.error("❌ ERROR: GEMINI_API_KEY is not set! Make sure it's added to your environment variables.");
 }
-
-let lastMessageTime = 0;
-const RATE_LIMIT_MS = 3000; // 3-second cooldown
-let userRateLimits = {}; // Store per-user cooldowns
+const RATE_LIMIT_MS = 3000;
+let userRateLimits = {};
 
 exports.handler = async (event) => {
     try {
@@ -41,14 +39,28 @@ exports.handler = async (event) => {
 
         // Make the API request
         const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+        console.log(`🔍 Making request to: ${API_URL}?key=${API_KEY}`);
+
         const response = await axios.post(
-            `${API_URL}?key=${API_KEY}`, // Use the securely loaded API key
+            `${API_URL}?key=${API_KEY}`,
             {
                 contents: [{ parts: [{ text: chatHistory ? chatHistory + '\n' + message : message }] }],
             }
         );
 
-        if (!response.data || !response.data.candidates || response.data.candidates.length === 0) {
+        console.log("✅ Full API Response:", JSON.stringify(response.data, null, 2));
+
+        // Check for API errors
+        if (response.data.error) {
+            console.error("❌ API Error:", response.data.error);
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ response: "Error from API: " + response.data.error.message })
+            };
+        }
+
+        // Check if candidates exist
+        if (!response.data.candidates || response.data.candidates.length === 0) {
             return {
                 statusCode: 200,
                 body: JSON.stringify({ response: "I'm not sure how to respond to that. Can you try rephrasing?" })
@@ -60,6 +72,7 @@ exports.handler = async (event) => {
             body: JSON.stringify({ response: response.data.candidates[0].content.parts[0].text })
         };
     } catch (error) {
+        console.error("❌ Server Error:", error.message);
         return {
             statusCode: 500,
             body: JSON.stringify({ response: "I'm having trouble understanding you. Try again later!", details: error.message })
